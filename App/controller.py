@@ -60,22 +60,30 @@ def loadTrips(analyzer):
     Llama a la función loadFile para cargarlos
     individualmente.
     """
+   
     for filename in os.listdir(cf.data_dir):
         if filename.endswith('.csv'):
-            print('Caragndo archivo: ' + filename)
+            print('Cargando archivo: ' + filename)
             loadFile(analyzer,filename)
-        
+            
 def loadFile(citibike, tripfile):
     """
     Carga uno por uno los archivos encontrados 
     en la carpeta Data.
+
+    Llama a la función en model para contar 
+    el total de viajes en bici realizados.
     """
     tripfile = cf.data_dir + tripfile
     input_file = csv.DictReader(open(tripfile,encoding ="utf-8"),delimiter=",")
 
+    num_trips = 0
+
     for trip in input_file:
         model.addTrip(citibike,trip)
+        num_trips = num_trips + 1
 
+    model.addNumTripsToTotal(citibike,num_trips)  
 # ___________________________________________________
 #  Funciones para consultas de requerimientos
 # ___________________________________________________
@@ -88,8 +96,6 @@ def numConnectedComponents(cont,sta1,sta2):
     conectados.
     """
     return model.numSCC(cont['graph']) , model.sameCC(cont['graph'],sta1,sta2)
-
-
 
 # ___________________________________________________
 #  Funciones para consultas generales
@@ -109,3 +115,4 @@ def numConnections(citibike):
     estaciones.
     """
     return model.numConnections(citibike)
+

@@ -55,21 +55,25 @@ def printOptionTwo(cont):
     """
     Imprime la carga de datos.
     """
-    print('Estaciones cargadas: ' + str(controller.numStations(cont)))
-    print('Número de conexiones (arcos) entre estaciones cargadas: ' + str(controller.numConnections(cont)))
+    print('\nEstaciones (vértices) cargadas: ' + str(controller.numStations(cont)))
+    print('Conexiones (arcos) entre estaciones cargadas: ' + str(controller.numConnections(cont)))
+    print('Viajes en bici cargados: ' + str(cont['Num Of Total Trips']))
     
-    print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))
+    print('\nEl limite de recursion actual: ' + str(sys.getrecursionlimit()))
     sys.setrecursionlimit(recursionLimit)
     print('El limite de recursion se ajusta a: ' + str(recursionLimit))
+
 
 def printOptionThree(clusters):
     """
     """
-    print('Se encontraron: ' + str(clusters[0]) + ' componentes conectados.')
-    if clusters[1]  :
+    print('Se encontraron: ' + str(clusters[0]) + ' componentes fuertemente conectados.')
+    if clusters[1] == True:
         print('Las estaciones ingresadas se encuentran en el mismo cluster.')
-    else:
+    elif clusters[1] == False:
         print('Las estaciones ingresadas NO se encuentran en el mismo cluster.')
+    else:
+        print('Una o ambas estaciones ingresadas no existen.')
 
 # ___________________________________________________
 #  Menu principal
@@ -113,7 +117,7 @@ while True:
     elif int(inputs[0]) == 3:
         print("\nRequerimiento No 1 del Reto 4: ")
         sta1 = input("\nIngrese el ID de la estación 1: ")
-        sta2 = input("\nIngrese el ID de la estación 2: ")
+        sta2 = input("Ingrese el ID de la estación 2: ")
         clusters = controller.numConnectedComponents(cont,sta1,sta2)
         printOptionThree(clusters)
 

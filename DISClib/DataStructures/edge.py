@@ -37,8 +37,9 @@ def newEdge(va, vb, weight=0):
     Crea un nuevo arco entrelos vertices va y vb
     """
     edge = {'vertexA': va,
-            'vertexB': vb,
-            'weight': weight
+            'vertexB': vb,          
+            'weight': weight,        #Promedio de los pesos de los arcos en la misma dirección.
+            'count': 1               #Número de arcos en la misma dirección.            
             }
     return edge
 
@@ -75,3 +76,13 @@ def compareedges(edge1, edge2):
         if other(edge1, e1v) == other(edge2, e2v):
             return True
     return False
+
+def updateAverageWeight(edge,weight):
+    """
+    Actualiza el peso del arco entre los vertices va y
+    vb, usando el promedio de mutiples pesos.
+    """
+
+    newweight = (edge['weight']*edge['count'] + weight /edge['count']+1)
+    edge['weight'] = newweight
+    edge['count'] += 1

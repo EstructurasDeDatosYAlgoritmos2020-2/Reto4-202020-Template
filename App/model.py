@@ -28,6 +28,7 @@ from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import listiterator as it
+from DISClib.DataStructures import edge as e
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
@@ -61,6 +62,7 @@ def newAnalyzer():
                                               directed=True,
                                               size=1000,
                                               comparefunction=compareStations)
+        analyzer['Num Of Total Trips'] = 0  
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:newAnalyzer')
@@ -90,24 +92,44 @@ def addStation(citibike, station_id):
 def addConnection(citibike,origin,destination,duration):
     """
     Adiciona un arco entre dos estaciones.
+    Si el arco ya existe, se actualiza su peso promedio.
     """
     edge = gr.getEdge(citibike['graph'],origin,destination)
     if edge is None:
         gr.addEdge(citibike['graph'],origin,destination,duration)
+    else:
+        e.updateAverageWeight(edge,duration)
+
+def addNumTripsToTotal(citibike,numFileTrips):
+    """
+    Calcula el total de viajes en bici realizados.
+    """
+    citibike['Num Of Total Trips'] = citibike['Num Of Total Trips'] + numFileTrips
 
 # ==============================
 # Funciones de consulta requisitos
 # ==============================
 
 def numSCC(graph):
+    """
+    RETO4 | REQ1
+    Retorna el número de componentes fuertemente conectados.
+    """
     sc = scc.KosarajuSCC(graph)
     return scc.connectedComponents(sc)
 
 def sameCC(graph,station1, station2):
+    """
+    RETO4 | REQ1
+    Consulta si dos vértices pertenecen al mismo componente
+    fuertemente conectado.
+    """
     sc = scc.KosarajuSCC(graph)
-    return scc.stronglyConnected(sc, station1, station2)
 
-
+    if gr.containsVertex(graph,station1) and gr.containsVertex(graph,station2):   
+        return scc.stronglyConnected(sc, station1, station2)
+    else:
+        return None
 
 # ==============================
 # Funciones de consulta generales
