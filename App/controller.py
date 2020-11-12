@@ -25,6 +25,7 @@
  """
 
 import config as cf
+import os
 from App import model
 import csv
 
@@ -40,12 +41,71 @@ recae sobre el controlador.
 #  Inicializacion del catalogo
 # ___________________________________________________
 
+def init():
+    """
+    Llama la funcion de inicialización  del modelo.
+    """
+    analyzer = model.newAnalyzer()
+    return analyzer
 
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
 
+def loadTrips(analyzer):
+    """
+    Función que carga todos los archivos .csv
+    encontrados en Data.
+    Llama a la función loadFile para cargarlos
+    individualmente.
+    """
+    for filename in os.listdir(cf.data_dir):
+        if filename.endswith('.csv'):
+            print('Caragndo archivo: ' + filename)
+            loadFile(analyzer,filename)
+        
+def loadFile(citibike, tripfile):
+    """
+    Carga uno por uno los archivos encontrados 
+    en la carpeta Data.
+    """
+    tripfile = cf.data_dir + tripfile
+    input_file = csv.DictReader(open(tripfile,encoding ="utf-8"),delimiter=",")
+
+    for trip in input_file:
+        model.addTrip(citibike,trip)
+
 # ___________________________________________________
-#  Funciones para consultas
+#  Funciones para consultas de requerimientos
 # ___________________________________________________
+
+def numConnectedComponents(cont,sta1,sta2):
+    """
+    RETO4 | REQ1
+    Llama a la función en el model
+    que retorna los componentes fuertemente 
+    conectados.
+    """
+    return model.numSCC(cont['graph']) , model.sameCC(cont['graph'],sta1,sta2)
+
+
+
+# ___________________________________________________
+#  Funciones para consultas generales
+# ___________________________________________________
+
+def numStations(citibike):
+    """
+    Llama la función en model que retorna
+    el número de estaciones (vértices).
+    """
+    return model.numStations(citibike)
+
+def numConnections(citibike):
+    """
+    Llama la función en model que retorna
+    el número de conexiones (arcos) entres
+    estaciones.
+    """
+    return model.numConnections(citibike)
