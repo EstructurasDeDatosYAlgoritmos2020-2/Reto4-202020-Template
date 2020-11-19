@@ -131,6 +131,13 @@ def sameCC(graph,station1, station2):
     else:
         return None
 
+def touristroutes(graph,initial_station,time1,time2):
+    """
+    RETO4 | REQ2
+    Retorna las rutas turísticas posibles
+    dado un límite de tiempo y una estación inicial.
+    """
+
 # ==============================
 # Funciones de consulta generales
 # ==============================
@@ -147,7 +154,6 @@ def numConnections(citibike):
     entre estaciones.
     """
     return gr.numEdges(citibike['graph'])
-
 
 # ==============================
 # Funciones Helper

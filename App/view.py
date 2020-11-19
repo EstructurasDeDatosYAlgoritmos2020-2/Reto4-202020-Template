@@ -66,6 +66,8 @@ def printOptionTwo(cont):
 
 def printOptionThree(clusters):
     """
+    RETO4 | REQ1
+    Imprime el requerimiento 1.
     """
     print('Se encontraron: ' + str(clusters[0]) + ' componentes fuertemente conectados.')
     if clusters[1] == True:
@@ -75,6 +77,21 @@ def printOptionThree(clusters):
     else:
         print('Una o ambas estaciones ingresadas no existen.')
 
+def printOptionFour():
+    """
+    RETO4 | REQ2
+    Imprime el requerimiento 2.
+    """
+    print("Se encontraron un total de " + + "rutas posibles.")
+
+def printOptionSeven():
+    """
+    RETO4 | REQ5
+    """
+def printOptionEight():
+    """
+    RETO4 | REQ6
+    """
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
@@ -86,7 +103,7 @@ def printMenu():
     print("1- Inicializar Analizador")
     print("2- Cargar información de Sistema CitiBike.")
     print("3- Requerimento 1: Cantidad de clusters de viajes.")
-#    print("4- Requerimento 2: Ruta turísitica circular.")
+    print("4- Requerimento 2: Ruta turísitica circular.")
 #    print("5- Requerimento 3: Estaciones Críticas.")
 #    print("6- Requerimento 4: Ruta turística por resistencia.")
 #    print("7- Requerimento 5: Recomendador de rutas.")
@@ -123,6 +140,13 @@ while True:
 
     elif int(inputs[0]) == 4:
         print("\nRequerimiento No 2 del Reto 4: ")
+        sta = input("\nIngres el ID de la estación de inicio.")
+        print("Ingrese el total de tiempo disponible: ")
+        t1 = input("Rango inferior: ")
+        t2 = input("Rango superior: ")
+        routes = controller.touristroutes(cont,sta,t1,t2)
+        printOptionFour(routes)
+
     elif int(inputs[0]) == 5:
         print("\nRequerimiento No 3 del Reto 4: ")
     elif int(inputs[0]) == 6:

@@ -78,24 +78,30 @@ def loadFile(citibike, tripfile):
     input_file = csv.DictReader(open(tripfile,encoding ="utf-8"),delimiter=",")
 
     num_trips = 0
-
     for trip in input_file:
         model.addTrip(citibike,trip)
         num_trips = num_trips + 1
-
     model.addNumTripsToTotal(citibike,num_trips)  
 # ___________________________________________________
 #  Funciones para consultas de requerimientos
 # ___________________________________________________
 
-def numConnectedComponents(cont,sta1,sta2):
+def numConnectedComponents(citibike,station1,station2):
     """
     RETO4 | REQ1
     Llama a la función en el model
     que retorna los componentes fuertemente 
     conectados.
     """
-    return model.numSCC(cont['graph']) , model.sameCC(cont['graph'],sta1,sta2)
+    return model.numSCC(citibike['graph']) , model.sameCC(citibike['graph'],station1,station2)
+
+def touristroutes(citibike,initial_station,time1,time2):
+    """
+    RETO4 | REQ 2
+    Llama a la función en el model que retorna
+    las rutas turísticas posibles.
+    """
+    return model.touristroutes(citibike['graph'],initial_station,time1,time2)
 
 # ___________________________________________________
 #  Funciones para consultas generales
