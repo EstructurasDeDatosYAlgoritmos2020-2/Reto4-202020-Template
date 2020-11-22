@@ -281,11 +281,12 @@ def getEdge(graph, vertexa, vertexb):
         itvertex = it.newIterator(lst)
         while (it.hasNext(itvertex)):
             edge = it.next(itvertex)
-            if (e.either(edge) == vertexa or
-               (e.other(edge, e.either(edge)) == vertexa)):
-                if (e.either(edge) == vertexb or
-                   (e.other(edge, e.either(edge)) == vertexb)):
-                    return edge
+            if (e.either(edge) == vertexa) and
+               (e.other(edge, e.either(edge)) == vertexb)):
+               return edge
+            elif (not graph['directed']) and (e.either(edge) == vertexb) and
+                (e.other(edge, e.either(edge)) == vertexa):
+                return edge
         return None
     except Exception as exp:
         error.reraise(exp, 'ajlist:getedge')

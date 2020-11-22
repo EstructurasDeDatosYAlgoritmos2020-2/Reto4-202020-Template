@@ -138,6 +138,11 @@ def touristroutes(graph,initial_station,time1,time2):
     dado un límite de tiempo y una estación inicial.
     """
 
+    if gr.containsVertex(graph,initial_station):
+        sc = scc.KosarajuSCC(graph)
+        
+
+
 # ==============================
 # Funciones de consulta generales
 # ==============================
