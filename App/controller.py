@@ -103,6 +103,16 @@ def touristroutes(citibike,initial_station,time1,time2):
     """
     return model.touristroutes(citibike['graph'],initial_station,time1,time2)
 
+def routeRecommenderByAge(citibike,age):
+    """
+    RETO4 | REQ 5
+    Llama a la función en el model que retorna
+    la ruta más transitada por las personas en el 
+    rango de edad ingresado
+    """
+    
+    return model.routeRecommenderByAge(citibike,age)
+
 # ___________________________________________________
 #  Funciones para consultas generales
 # ___________________________________________________

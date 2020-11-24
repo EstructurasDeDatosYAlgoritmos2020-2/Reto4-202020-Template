@@ -64,6 +64,7 @@ def printOptionTwo(cont):
     print('El limite de recursion se ajusta a: ' + str(recursionLimit))
 
 
+
 def printOptionThree(clusters):
     """
     RETO4 | REQ1
@@ -77,6 +78,7 @@ def printOptionThree(clusters):
     else:
         print('Una o ambas estaciones ingresadas no existen.')
 
+
 def printOptionFour():
     """
     RETO4 | REQ2
@@ -84,10 +86,28 @@ def printOptionFour():
     """
     print("Se encontraron un total de " + + "rutas posibles.")
 
-def printOptionSeven():
+
+
+def printOptionSeven(route):
     """
     RETO4 | REQ5
+    Imprime el requerimiento 5.
     """
+    if route is not None:
+
+        winner_departure_station, winner_arrival_station, pathto , age_range = route
+
+        print('La edad ingresada se encuentra en el rango de: '+ str(age_range) + ' años.')
+        print('Estación de inicio más común para el rango de edad ingresado: '+ str(winner_departure_station))
+        print('Estación final más común para el rango de edad ingresado: '+ str(winner__station_arrival))
+        print('La lista de estaciones que abarca estas dos rutas es: ')
+        while (not stack.isEmpty(pathto)):
+            station = stack.pop(path)
+            print(station)
+    else:
+        print('La edad ingresada no es válida.')
+
+
 def printOptionEight():
     """
     RETO4 | REQ6
@@ -101,13 +121,13 @@ def printMenu():
     print("*******************************************")
     print("Bienvenido")
     print("1- Inicializar Analizador")
-    print("2- Cargar información de Sistema CitiBike.")
+    print("2- Cargar información del Sistema CitiBike.")
     print("3- Requerimento 1: Cantidad de clusters de viajes.")
     print("4- Requerimento 2: Ruta turísitica circular.")
 #    print("5- Requerimento 3: Estaciones Críticas.")
 #    print("6- Requerimento 4: Ruta turística por resistencia.")
-#    print("7- Requerimento 5: Recomendador de rutas.")
-#    print("8- Requerimento 6: Ruta de interés turístico.")
+    print("7- Requerimento 5: Recomendador de rutas.")
+    print("8- Requerimento 6: Ruta de interés turístico.")
 #    print("9- Bono 1: Identificación de estaciones para publicidad.")
 #    print("10- Bono 2: Identificación de biclicletas para mantenimiento.")
 
@@ -127,7 +147,7 @@ while True:
         cont = controller.init()
 
     elif int(inputs[0]) == 2:
-        print("\nCargando información de sistema Citibike ...")
+        print("\nCargando información del sistema Citibike ...")
         controller.loadTrips(cont)
         printOptionTwo(cont)
        
@@ -147,14 +167,19 @@ while True:
         routes = controller.touristroutes(cont,sta,t1,t2)
         printOptionFour(routes)
 
-    elif int(inputs[0]) == 5:
-        print("\nRequerimiento No 3 del Reto 4: ")
-    elif int(inputs[0]) == 6:
-        print("\nRequerimiento No 4 del Reto 4: ")
+#    elif int(inputs[0]) == 5:
+#        print("\nRequerimiento No 3 del Reto 4: ")
+#    elif int(inputs[0]) == 6:
+#        print("\nRequerimiento No 4 del Reto 4: ")
+
     elif int(inputs[0]) == 7:
         print("\nRequerimiento No 5 del Reto 4: ")
-#    elif int(inputs[0]) == 8:
-#        print("\nRequerimiento No 6 del Reto 4: ")
+        age = input("Ingrese su edad: ")
+        route = controller.routeRecommenderByAge(cont,age)
+        printOptionSeven(route)
+    elif int(inputs[0]) == 8:
+        print("\nRequerimiento No 6 del Reto 4: ")
+        printOptionEight()
 
     else:
         sys.exit(0)
