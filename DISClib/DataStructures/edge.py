@@ -82,7 +82,7 @@ def updateAverageWeight(edge,weight):
     Actualiza el peso del arco entre los vertices va y
     vb, usando el promedio de mutiples pesos.
     """
-
     newweight = (edge['weight']*edge['count'] + weight /edge['count']+1)
     edge['weight'] = newweight
-    edge['count'] += 1 
+    edge['count'] = edge['count'] + 1 
+    

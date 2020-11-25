@@ -57,13 +57,11 @@ def printOptionTwo(cont):
     """
     print('\nEstaciones (vértices) cargadas: ' + str(controller.numStations(cont)))
     print('Conexiones (arcos) entre estaciones cargadas: ' + str(controller.numConnections(cont)))
-    print('Viajes en bici cargados: ' + str(cont['Num Of Total Trips']))
+    print('Viajes en bici cargados: ' + str(cont['Num_Of_Total_Trips']))
     
     print('\nEl limite de recursion actual: ' + str(sys.getrecursionlimit()))
     sys.setrecursionlimit(recursionLimit)
     print('El limite de recursion se ajusta a: ' + str(recursionLimit))
-
-
 
 def printOptionThree(clusters):
     """
@@ -78,15 +76,12 @@ def printOptionThree(clusters):
     else:
         print('Una o ambas estaciones ingresadas no existen.')
 
-
 def printOptionFour():
     """
     RETO4 | REQ2
     Imprime el requerimiento 2.
     """
     print("Se encontraron un total de " + + "rutas posibles.")
-
-
 
 def printOptionSeven(route):
     """
@@ -95,18 +90,19 @@ def printOptionSeven(route):
     """
     if route is not None:
 
-        winner_departure_station, winner_arrival_station, pathto , age_range = route
+        departure_station, arrival_station, pathTo , age_range , cost = route
 
-        print('La edad ingresada se encuentra en el rango de: '+ str(age_range) + ' años.')
-        print('Estación de inicio más común para el rango de edad ingresado: '+ str(winner_departure_station))
-        print('Estación final más común para el rango de edad ingresado: '+ str(winner__station_arrival))
-        print('La lista de estaciones que abarca estas dos rutas es: ')
-        while (not stack.isEmpty(pathto)):
-            station = stack.pop(path)
-            print(station)
+        print('\nLa edad ingresada se encuentra en el rango de: '+ str(age_range) + ' años.')
+        print('Estación inicial más común para la edad ingresada: '+ str(departure_station['key']) +
+                                                ' con: '+str(departure_station['value'][age_range])+' viajes.')
+        print('Estación final más común para la edad ingresada: '+ str(arrival_station['key']) +
+                                                ' con: '+str(arrival_station['value'][age_range])+' viajes.')
+        print('La ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(cost) +' segundos, el recorrido es: ')
+        while (not stack.isEmpty(pathTo)):
+            station = stack.pop(pathTo)
+            print(str(station['vertexA'])+' - ' + str(station['vertexB']))
     else:
         print('La edad ingresada no es válida.')
-
 
 def printOptionEight():
     """

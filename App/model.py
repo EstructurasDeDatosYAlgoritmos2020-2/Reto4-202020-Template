@@ -32,8 +32,11 @@ from DISClib.DataStructures import mapentry as me
 from DISClib.DataStructures import listiterator as it
 from DISClib.DataStructures import edge as e
 
+
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
+from DISClib.Algorithms.Graphs import dfs
+
 from DISClib.Utils import error as error
 assert config
 
@@ -51,27 +54,23 @@ def newAnalyzer():
     """
     try:
         analyzer = {
-                    '': None,
                     'graph': None,
-                    '': None,
-                    '': None
+                    'Num_Of_Total_Trips': None,
+                    'Arrival_Ages': None,
+                    'Departure_Ages':None
                     }
-
-#        analyzer[''] = m.newMap(numelements=14000,
-#                                     maptype='PROBING',
-#                                     comparefunction=compareStopIds)#
 
         analyzer['graph'] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
                                               size=1000,
                                               comparefunction=compareStations)
-        analyzer['Num Of Total Trips'] = 0  
-        analyzer['Arrival Ages'] = m.newMap(numelements=100,
+        analyzer['Num_Of_Total_Trips'] = 0  
+        analyzer['Arrival_Ages'] = m.newMap(numelements=750,
                                                 maptype='CHAINING',
                                                 loadfactor=2,
                                                 comparefunction=compareStations)
 
-        analyzer['Departure Ages'] = m.newMap(numelements=100,
+        analyzer['Departure_Ages'] = m.newMap(numelements=750,
                                                 maptype='CHAINING',
                                                 loadfactor=2,
                                                 comparefunction=compareStations)
@@ -114,12 +113,13 @@ def addConnection(citibike,origin,destination,duration):
         gr.addEdge(citibike['graph'],origin,destination,duration)
     else:
         e.updateAverageWeight(edge,duration)
+        
 
 def addNumTripsToTotal(citibike,numFileTrips):
     """
     Calcula el total de viajes en bici realizados.
     """
-    citibike['Num Of Total Trips'] = citibike['Num Of Total Trips'] + numFileTrips
+    citibike['Num_Of_Total_Trips'] = citibike['Num_Of_Total_Trips'] + numFileTrips
 
 def addAge(citibike,origin,destination,birth):
     """
@@ -127,30 +127,29 @@ def addAge(citibike,origin,destination,birth):
     A cada estación añade el número de personas en un rango 
     de edad que llegan y salen de la misma.
     """
-    entry1 = m.get(citibike['Arrival Ages'],destination) 
-    entry2 = m.get(citibike['Departure Ages'],origin)
+    entry1 = m.get(citibike['Arrival_Ages'],destination) 
+    entry2 = m.get(citibike['Departure_Ages'],origin)
 
     if entry1 is None:
         arrival_age_entry = newStationAgeEntry()  
-        m.put(citibike['Arrival Ages'],destination,arrival_age_entry)
+        m.put(citibike['Arrival_Ages'],destination,arrival_age_entry)
     else:
         arrival_age_entry = me.getValue(entry1)
 
     if entry2 is None:
         departure_age_entry = newStationAgeEntry()  
-        m.put(citibike['Departure Ages'],origin,departure_age_entry)
+        m.put(citibike['Departure_Ages'],origin,departure_age_entry)
     else:
         departure_age_entry = me.getValue(entry2)    
 
     age = 2020 - int(birth)    
     key = ageRange(age)
-    
 
     if arrival_age_entry[key] is None:
         arrival_age_entry[key] = 1
     else:
         arrival_age_entry[key] = arrival_age_entry[key] + 1
-    
+
     if departure_age_entry[key] is None:
         departure_age_entry[key] = 1
     else:
@@ -184,7 +183,6 @@ def sameCC(graph,station1, station2):
     fuertemente conectado.
     """
     sc = scc.KosarajuSCC(graph)
-
     if gr.containsVertex(graph,station1) and gr.containsVertex(graph,station2):   
         return scc.stronglyConnected(sc, station1, station2)
     else:
@@ -197,19 +195,29 @@ def touristroutes(graph,initial_station,time1,time2):
     dado un límite de tiempo y una estación inicial.
     """
     if gr.containsVertex(graph,initial_station):
+        
+        sameSCC = m.newMap(numelements=7500,
+                        maptype='CHAINING',
+                        loadfactor=2,
+                        comparefunction=compareStations)
 
-        sc = scc.KosarajuSCC(graph)
-
-        accum_time = 0
+        sc = scc.KosarajuSCC(graph)  
         initial_sc_number = m.get(sc['idscc'],initial_station)
         all_stations = m.keySet(sc['idscc'])
 
-        sameSCC = m.newMap(numelements=75000)
-        for station in all_stations:
+        accum_time = 0
+
+        iterator = it.newIterator(all_stations)
+        while it.hasNext(iterator):
+            station = it.next(iterator)
             sc_number = m.get(sc['idscc'],station)
 
             if sc_number == initial_sc_number:
-                qweqwwq
+                m.put(sameCC,station,None)
+    
+
+
+        search = dfs.DepthFirstSearch()
 
 
 
@@ -235,33 +243,40 @@ def routeRecommenderByAge(citibike,age):
 
     if key is not None:
 
-        arrival_keys = m.keySet(citibike['Arrival Ages'])
-        departure_keys = m.keySet(citibike['Departure Ages'])
+        arrival_keys = m.keySet(citibike['Arrival_Ages'])
+        departure_keys = m.keySet(citibike['Departure_Ages'])
 
         max_value1 = 0
+        iterator1 = it.newIterator(departure_keys)
+        while it.hasNext(iterator1):
+            station = it.next(iterator1)
+            sta = m.get(citibike['Departure_Ages'],station)
+
+            trips_by_age = sta['value'][key]
+
+            if trips_by_age is not None:
+                if trips_by_age > max_value1:
+                    max_value1 = trips_by_age
+                    departure_station = sta
+                
         max_value2 = 0
+        iterator2 = it.newIterator(arrival_keys)
+        while it.hasNext(iterator2):
+            station = it.next(iterator2)
+            sta = m.get(citibike['Arrival_Ages'],station)
 
-        for station in arrival_keys:
-            sta = m.get(citibike['Arrival Ages'],station)
-            trips_by_age = sta['value'][age]
+            trips_by_age = sta['value'][key]
 
-            if trips_by_age > max_value1:
-                max_value1 = trips_by_age
-                winner_arrival_station = sta
-        
-        for station in departure_keys:
-            sta = m.get(citibike['Departure Ages'],station)
-            trips_by_age = sta['value'][age]
+            if trips_by_age is not None:
+                if trips_by_age > max_value2:
+                    max_value2 = trips_by_age
+                    arrival_station = sta
 
-            if trips_by_age > max_value1:
-                max_value1 = trips_by_age
-                winner_departure_station = sta
+        paths = djk.Dijkstra(citibike['graph'],departure_station['key'])
+        pathTo = djk.pathTo(paths,arrival_station['key'])
+        cost = djk.distTo(paths,arrival_station['key'])
 
-        paths = djk.Dijkstra(citibike['graph'],winner_departure_station['key'])
-        pathto = djk.pathTo(citibike['graph'],winner_arrival_station['key'])
-
-        return winner_departure_station, winner_arrival_station, pathto , key
-    
+        return departure_station, arrival_station, pathTo , key , cost
     else:
         return None
 
@@ -290,9 +305,7 @@ def ageRange(age):
     """
     Función auxiliar para retornar un rango de edad.
     """
-    if age <= 10:
-        key =  'Menor de 10'  
-    elif age >= 11 and age <= 20:
+    if age >= 11 and age <= 20:
         key = '11-20'
     elif age >= 21 and age <= 30:
         key = '21-30'
@@ -306,7 +319,6 @@ def ageRange(age):
         key = 'Mayor de 60'
     else:
         key = None
-
     return key
 
 # ==============================
