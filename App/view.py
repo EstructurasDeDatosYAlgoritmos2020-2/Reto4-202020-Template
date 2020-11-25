@@ -83,20 +83,31 @@ def printOptionFour():
     """
     print("Se encontraron un total de " + + "rutas posibles.")
 
+def printOptionFive(critical_stations):
+    """
+    RETO4 | REQ3
+    Imprime el requerimiento 3.
+    """
+    most_departure, most_arrival, least_used = critical_stations
+    print('La estación de la que más viajes salen hacia otras estaciones es: '+ str(most_departure['key'])+
+                                                                            ' con: '+ str(most_departure['value']['Total_Departure_Trips']) +
+                                                                            ' viajes.')
+    print('La estación a la que más bicis llegan provenientes de otras estaciones: '+ str(most_arrival['key'])+
+                                                                            ' con: '+ str(most_arrival['value']['Total_Arrival_Trips']) +
+                                                                            ' viajes.')
+
 def printOptionSeven(route):
     """
     RETO4 | REQ5
     Imprime el requerimiento 5.
     """
     if route is not None:
-
         departure_station, arrival_station, pathTo , age_range , cost = route
-
         print('\nLa edad ingresada se encuentra en el rango de: '+ str(age_range) + ' años.')
         print('Estación inicial más común para la edad ingresada: '+ str(departure_station['key']) +
-                                                ' con: '+str(departure_station['value'][age_range])+' viajes.')
+                                                ' con: '+str(departure_station['value']['Departure_Ages'][age_range])+' viajes.')
         print('Estación final más común para la edad ingresada: '+ str(arrival_station['key']) +
-                                                ' con: '+str(arrival_station['value'][age_range])+' viajes.')
+                                                ' con: '+str(arrival_station['value']['Arrival_Ages'][age_range])+' viajes.')
         print('La ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(cost) +' segundos, el recorrido es: ')
         while (not stack.isEmpty(pathTo)):
             station = stack.pop(pathTo)
@@ -119,8 +130,8 @@ def printMenu():
     print("1- Inicializar Analizador")
     print("2- Cargar información del Sistema CitiBike.")
     print("3- Requerimento 1: Cantidad de clusters de viajes.")
-    print("4- Requerimento 2: Ruta turísitica circular.")
-#    print("5- Requerimento 3: Estaciones Críticas.")
+#    print("4- Requerimento 2: Ruta turísitica circular.")
+    print("5- Requerimento 3: Estaciones Críticas.")
 #    print("6- Requerimento 4: Ruta turística por resistencia.")
     print("7- Requerimento 5: Recomendador de rutas.")
     print("8- Requerimento 6: Ruta de interés turístico.")
@@ -163,8 +174,10 @@ while True:
         routes = controller.touristroutes(cont,sta,t1,t2)
         printOptionFour(routes)
 
-#    elif int(inputs[0]) == 5:
-#        print("\nRequerimiento No 3 del Reto 4: ")
+    elif int(inputs[0]) == 5:
+        print("\nRequerimiento No 3 del Reto 4: ")
+        critical_stations = controller.criticalStations(cont)
+        printOptionFive(critical_stations)
 #    elif int(inputs[0]) == 6:
 #        print("\nRequerimiento No 4 del Reto 4: ")
 

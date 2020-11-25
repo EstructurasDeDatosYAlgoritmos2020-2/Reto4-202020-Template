@@ -56,8 +56,7 @@ def newAnalyzer():
         analyzer = {
                     'graph': None,
                     'Num_Of_Total_Trips': None,
-                    'Arrival_Ages': None,
-                    'Departure_Ages':None
+                    'Edges_Map': None,
                     }
 
         analyzer['graph'] = gr.newGraph(datastructure='ADJ_LIST',
@@ -65,12 +64,8 @@ def newAnalyzer():
                                               size=1000,
                                               comparefunction=compareStations)
         analyzer['Num_Of_Total_Trips'] = 0  
-        analyzer['Arrival_Ages'] = m.newMap(numelements=750,
-                                                maptype='CHAINING',
-                                                loadfactor=2,
-                                                comparefunction=compareStations)
 
-        analyzer['Departure_Ages'] = m.newMap(numelements=750,
+        analyzer['Edges_Map'] = m.newMap(numelements=750,
                                                 maptype='CHAINING',
                                                 loadfactor=2,
                                                 comparefunction=compareStations)
@@ -93,7 +88,8 @@ def addTrip(citibike, trip):
     addStation(citibike,origin)
     addStation(citibike,destination)
     addConnection(citibike,origin,destination,duration)
-    addAge(citibike, origin,destination,birth)
+    addEdgeToMap(citibike,origin,birth,0)
+    addEdgeToMap(citibike,destination,birth,1)
 
 def addStation(citibike, station_id):
     """
@@ -121,47 +117,53 @@ def addNumTripsToTotal(citibike,numFileTrips):
     """
     citibike['Num_Of_Total_Trips'] = citibike['Num_Of_Total_Trips'] + numFileTrips
 
-def addAge(citibike,origin,destination,birth):
+def addEdgeToMap(citibike,station,birth,criteria):
     """
-    RETO 4 | REQ 5 
+    RETO 4 | REQ 5
+           | REQ 3 
+
     A cada estación añade el número de personas en un rango 
     de edad que llegan y salen de la misma.
+
+    Cálcula el total de viajes de sálida y llegada.
     """
-    entry1 = m.get(citibike['Arrival_Ages'],destination) 
-    entry2 = m.get(citibike['Departure_Ages'],origin)
-
-    if entry1 is None:
-        arrival_age_entry = newStationAgeEntry()  
-        m.put(citibike['Arrival_Ages'],destination,arrival_age_entry)
+    entry = m.get(citibike['Edges_Map'],station) 
+    if entry is None:
+        edge_entry = newStationEntry()  
+        m.put(citibike['Edges_Map'],station,edge_entry)
     else:
-        arrival_age_entry = me.getValue(entry1)
+        edge_entry = me.getValue(entry)
 
-    if entry2 is None:
-        departure_age_entry = newStationAgeEntry()  
-        m.put(citibike['Departure_Ages'],origin,departure_age_entry)
-    else:
-        departure_age_entry = me.getValue(entry2)    
+    if criteria == 0:
+        trip_condition = 'Departure_Ages'
+        total_trips = 'Total_Departure_Trips'
+    if criteria == 1:
+        trip_condition = 'Arrival_Ages'
+        total_trips = 'Total_Arrival_Trips'
 
-    age = 2020 - int(birth)    
+    age = 2020 - int(birth)
     key = ageRange(age)
-
-    if arrival_age_entry[key] is None:
-        arrival_age_entry[key] = 1
+    if edge_entry[trip_condition][key] is None:
+        edge_entry[trip_condition][key] = 1
     else:
-        arrival_age_entry[key] = arrival_age_entry[key] + 1
+        edge_entry[trip_condition][key] = edge_entry[trip_condition][key] + 1
 
-    if departure_age_entry[key] is None:
-        departure_age_entry[key] = 1
-    else:
-        departure_age_entry[key] = departure_age_entry[key] + 1
+    edge_entry[total_trips] = edge_entry[total_trips] + 1
 
-def newStationAgeEntry():
+def newStationEntry():
     """
-    Crea un entry en el mapa para una estación 
-    cuyas llaves serán los distintos rangos de edades.
+    Crea un entry en el mapa para una estación.
+    Tiene tres llaves:
+        Rango de edades de viajes que salen del vértice.
+        Rango de edades de viajes que llegan al vértice.
+        Número total de viajes.
     """
-    entry = {'Menor de 10': None, '11-20': None, '21-30': None, '31-40': None,
-            '41-50': None, '51-60': None, 'Mayor de 60': None}
+    entry = {'Arrival_Ages':None,'Departure_Ages':None,'Total_Arrival_Trips':0,'Total_Departure_Trips':0}
+
+    entry['Arrival_Ages'] = {'Menor de 10': None, '11-20': None, '21-30': None, '31-40': None,
+                            '41-50': None, '51-60': None, 'Mayor de 60': None}
+    entry['Departure_Ages'] = {'Menor de 10': None, '11-20': None, '21-30': None, '31-40': None,
+                            '41-50': None, '51-60': None, 'Mayor de 60': None}
     return entry
 
 # ==============================
@@ -232,6 +234,44 @@ def touristroutes(graph,initial_station,time1,time2):
             adja = it.next(iterator)
             edge = gr.getEdge(sc,initial_station,adja)
         
+def criticalStations(citibike):
+    """
+    RETO 4 | REQ 3
+    Retorna:
+        La estación de donde salen más viajes.
+        La estación a donde llegan más viajes.
+
+    """
+    
+    stations_keys = m.keySet(citibike['Edges_Map'])
+    max_value1 = 0
+    max_value2= 0
+    min_value = 10000
+
+    iterator1 = it.newIterator(stations_keys)
+    while it.hasNext(iterator1):
+        station = it.next(iterator1)
+        sta = m.get(citibike['Edges_Map'],station)
+
+        total_arrival_trips = sta['value']['Total_Arrival_Trips']
+        total_departure_trips = sta['value']['Total_Departure_Trips']
+
+        if total_arrival_trips > max_value1:
+            max_value1 = total_arrival_trips
+            most_arrival = sta
+
+        if total_departure_trips > max_value2:
+            max_value2 = total_departure_trips
+            most_departure = sta
+
+        if (total_departure_trips + total_arrival_trips) < min_value:
+            min_value = (total_departure_trips + total_arrival_trips)
+            least_used = sta
+        
+    return most_departure, most_arrival, least_used
+        
+
+
 
 def routeRecommenderByAge(citibike,age):
     """
@@ -243,35 +283,29 @@ def routeRecommenderByAge(citibike,age):
 
     if key is not None:
 
-        arrival_keys = m.keySet(citibike['Arrival_Ages'])
-        departure_keys = m.keySet(citibike['Departure_Ages'])
+        stations_keys = m.keySet(citibike['Edges_Map'])
 
         max_value1 = 0
-        iterator1 = it.newIterator(departure_keys)
+        max_value2 = 0
+        iterator1 = it.newIterator(stations_keys)
         while it.hasNext(iterator1):
             station = it.next(iterator1)
-            sta = m.get(citibike['Departure_Ages'],station)
+            sta = m.get(citibike['Edges_Map'],station)
 
-            trips_by_age = sta['value'][key]
+            departure_trips_by_age = sta['value']['Departure_Ages'][key]
 
-            if trips_by_age is not None:
-                if trips_by_age > max_value1:
-                    max_value1 = trips_by_age
+            if departure_trips_by_age is not None:
+                if departure_trips_by_age > max_value1:
+                    max_value1 = departure_trips_by_age
                     departure_station = sta
-                
-        max_value2 = 0
-        iterator2 = it.newIterator(arrival_keys)
-        while it.hasNext(iterator2):
-            station = it.next(iterator2)
-            sta = m.get(citibike['Arrival_Ages'],station)
+            
+            arrival_trips_by_age = sta['value']['Arrival_Ages'][key]
 
-            trips_by_age = sta['value'][key]
-
-            if trips_by_age is not None:
-                if trips_by_age > max_value2:
-                    max_value2 = trips_by_age
+            if arrival_trips_by_age is not None:
+                if arrival_trips_by_age > max_value2:
+                    max_value2 = arrival_trips_by_age
                     arrival_station = sta
-
+                
         paths = djk.Dijkstra(citibike['graph'],departure_station['key'])
         pathTo = djk.pathTo(paths,arrival_station['key'])
         cost = djk.distTo(paths,arrival_station['key'])
@@ -279,6 +313,7 @@ def routeRecommenderByAge(citibike,age):
         return departure_station, arrival_station, pathTo , key , cost
     else:
         return None
+
 
 # ==============================
 # Funciones de consulta generales

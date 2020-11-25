@@ -103,6 +103,15 @@ def touristroutes(citibike,initial_station,time1,time2):
     """
     return model.touristroutes(citibike['graph'],initial_station,time1,time2)
 
+def criticalStations(citibike):
+    """
+    RETO4 | REQ 3
+    Llama a la función en el model que retorna las 
+    estaciones críticas.
+    """
+    return model.criticalStations(citibike)
+
+
 def routeRecommenderByAge(citibike,age):
     """
     RETO4 | REQ 5
