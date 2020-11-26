@@ -36,6 +36,7 @@ from DISClib.DataStructures import edge as e
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Algorithms.Graphs import dfs
+from DISClib.Algorithms.Sorting import mergesort as mg
 
 from DISClib.Utils import error as error
 assert config
@@ -149,6 +150,7 @@ def addEdgeToMap(citibike,station,birth,criteria):
         edge_entry[trip_condition][key] = edge_entry[trip_condition][key] + 1
 
     edge_entry[total_trips] = edge_entry[total_trips] + 1
+    edge_entry['Total_Trips'] = edge_entry['Total_Arrival_Trips'] + edge_entry['Total_Departure_Trips']
 
 def newStationEntry():
     """
@@ -158,12 +160,13 @@ def newStationEntry():
         Rango de edades de viajes que llegan al vértice.
         Número total de viajes.
     """
-    entry = {'Arrival_Ages':None,'Departure_Ages':None,'Total_Arrival_Trips':0,'Total_Departure_Trips':0}
+    entry = {'Arrival_Ages':None,'Departure_Ages':None,'Total_Arrival_Trips':0,'Total_Departure_Trips':0, 'Total_Trips': None}
 
     entry['Arrival_Ages'] = {'Menor de 10': None, '11-20': None, '21-30': None, '31-40': None,
                             '41-50': None, '51-60': None, 'Mayor de 60': None}
     entry['Departure_Ages'] = {'Menor de 10': None, '11-20': None, '21-30': None, '31-40': None,
                             '41-50': None, '51-60': None, 'Mayor de 60': None}
+
     return entry
 
 # ==============================
@@ -221,13 +224,7 @@ def touristroutes(graph,initial_station,time1,time2):
 
         search = dfs.DepthFirstSearch()
 
-
-
-
-
         adjacents = gr.adjacents(sc,initial_station)
-
-
 
         iterator = it.newIterator(adjacents)
         while it.hasNext(iterator):
@@ -238,41 +235,47 @@ def criticalStations(citibike):
     """
     RETO 4 | REQ 3
     Retorna:
-        La estación de donde salen más viajes.
-        La estación a donde llegan más viajes.
-
+        Las tres estaciones de donde salen más viajes.
+        La tres estaciones de donde llegan más viajes.
+        La tres estaciones menos usadas.
     """
-    
+    top_arrival = []
+    top_departure = []
+    least_used = []
+
+    arrival_lt_sorted = lt.newList(datastructure='ARRAY_LIST',cmpfunction=None)
+    departure_lt_sorted = lt.newList(datastructure='ARRAY_LIST',cmpfunction=compareValues)
+    total_trips_sorted = lt.newList(datastructure='ARRAY_LIST',cmpfunction=compareValues)
+
     stations_keys = m.keySet(citibike['Edges_Map'])
-    max_value1 = 0
-    max_value2= 0
-    min_value = 10000
-
-    iterator1 = it.newIterator(stations_keys)
-    while it.hasNext(iterator1):
-        station = it.next(iterator1)
+    
+    iterator = it.newIterator(stations_keys)
+    while it.hasNext(iterator):
+        station = it.next(iterator)
         sta = m.get(citibike['Edges_Map'],station)
+            
+        lt.addLast(arrival_lt_sorted,sta)
+        lt.addLast(departure_lt_sorted,sta)
+        lt.addLast(total_trips_sorted,sta)
 
-        total_arrival_trips = sta['value']['Total_Arrival_Trips']
-        total_departure_trips = sta['value']['Total_Departure_Trips']
+    mg.mergesort(arrival_lt_sorted,greaterValueArrival)
+    mg.mergesort(departure_lt_sorted,greaterValueDeparture)
+    mg.mergesort(total_trips_sorted,greaterTotalTrips)
 
-        if total_arrival_trips > max_value1:
-            max_value1 = total_arrival_trips
-            most_arrival = sta
+    i = 0
+    while i <= 3:
+        top_arr = lt.removeFirst(arrival_lt_sorted)    
+        top_arrival.append(top_arr)
 
-        if total_departure_trips > max_value2:
-            max_value2 = total_departure_trips
-            most_departure = sta
+        top_dep = lt.removeFirst(departure_lt_sorted)
+        top_departure.append(top_dep)
 
-        if (total_departure_trips + total_arrival_trips) < min_value:
-            min_value = (total_departure_trips + total_arrival_trips)
-            least_used = sta
+        least = lt.removeLast(total_trips_sorted)
+        least_used.append(least)
+        i += 1
+
+    return top_arrival, top_departure, least_used
         
-    return most_departure, most_arrival, least_used
-        
-
-
-
 def routeRecommenderByAge(citibike,age):
     """
     RETO 4 | REQ 5
@@ -313,6 +316,7 @@ def routeRecommenderByAge(citibike,age):
         return departure_station, arrival_station, pathTo , key , cost
     else:
         return None
+
 
 
 # ==============================
@@ -356,6 +360,20 @@ def ageRange(age):
         key = None
     return key
 
+def greaterValueArrival(elem1,elem2):
+    """
+    """
+    return int(elem1['value']['Total_Arrival_Trips']) > int(elem2['value']['Total_Arrival_Trips'])
+
+def greaterValueDeparture(elem1,elem2):
+    """
+    """
+    return int(elem1['value']['Total_Departure_Trips']) > int(elem2['value']['Total_Departure_Trips'])
+
+def greaterTotalTrips(elem1,elem2):
+    """
+    """
+    return int(elem1['value']['Total_Trips']) > int(elem2['value']['Total_Trips'])
 # ==============================
 # Funciones de Comparacion
 # ==============================
@@ -369,6 +387,19 @@ def compareStations(sta1,sta2):
     if (sta1 == station2code):
         return 0
     elif (sta1 > station2code):
+        return 1
+    else:
+        return -1
+
+def compareValues(value1,value2):
+    """
+    """
+    value1 = value1['key']
+    value2 = value2['key']
+    
+    if (value1 == value2):
+        return 0
+    elif (value1 > value2):
         return 1
     else:
         return -1

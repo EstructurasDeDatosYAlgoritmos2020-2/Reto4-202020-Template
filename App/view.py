@@ -88,13 +88,20 @@ def printOptionFive(critical_stations):
     RETO4 | REQ3
     Imprime el requerimiento 3.
     """
-    most_departure, most_arrival, least_used = critical_stations
-    print('La estación de la que más viajes salen hacia otras estaciones es: '+ str(most_departure['key'])+
-                                                                            ' con: '+ str(most_departure['value']['Total_Departure_Trips']) +
-                                                                            ' viajes.')
-    print('La estación a la que más bicis llegan provenientes de otras estaciones: '+ str(most_arrival['key'])+
-                                                                            ' con: '+ str(most_arrival['value']['Total_Arrival_Trips']) +
-                                                                            ' viajes.')
+    most_arrival, most_departure , least_used = critical_stations
+
+    print('\nLas estaciones de las que más viajes salen hacia otras estaciones son: ')
+    for station in most_departure: 
+        print(str(station['key'])+' con: '+ str(station['value']['Total_Departure_Trips']) +' viajes.')
+
+    print('\nLas estaciones a las que más bicis llegan provenientes de otras estaciones son: ')
+    for station in most_arrival:
+        print(str(station['key'])+' con: '+ str(station['value']['Total_Arrival_Trips']) +' viajes.')
+
+    print('\nLas estaciones menos utilizadas son: ')
+    for station in least_used:
+        print(str(station['key'])+' con: '+ str(station['value']['Total_Trips']) +' viajes en total.')
+
 
 def printOptionSeven(route):
     """
@@ -160,8 +167,8 @@ while True:
        
     elif int(inputs[0]) == 3:
         print("\nRequerimiento No 1 del Reto 4: ")
-        sta1 = input("\nIngrese el ID de la estación 1: ")
-        sta2 = input("Ingrese el ID de la estación 2: ")
+        sta1 = input("\nIngrese el ID de la estación 1: ") # nosec
+        sta2 = input("Ingrese el ID de la estación 2: ") # nosec
         clusters = controller.numConnectedComponents(cont,sta1,sta2)
         printOptionThree(clusters)
 
@@ -193,3 +200,6 @@ while True:
     else:
         sys.exit(0)
 sys.exit(0)
+
+[bandit]
+skips: B322
