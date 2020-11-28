@@ -115,10 +115,15 @@ def printOptionSeven(route):
                                                 ' con: '+str(departure_station['value']['Departure_Ages'][age_range])+' viajes.')
         print('Estación final más común para la edad ingresada: '+ str(arrival_station['key']) +
                                                 ' con: '+str(arrival_station['value']['Arrival_Ages'][age_range])+' viajes.')
-        print('La ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(cost) +' segundos, el recorrido es: ')
-        while (not stack.isEmpty(pathTo)):
-            station = stack.pop(pathTo)
-            print(str(station['vertexA'])+' - ' + str(station['vertexB']))
+        
+        if pathTo is None:
+            print('No hay ruta válida que conecte a las dos estaciones.')
+        else:        
+        
+            print('La ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(cost) +' segundos, el recorrido es: ')
+            while (not stack.isEmpty(pathTo)):
+                station = stack.pop(pathTo)
+                print(str(station['vertexA'])+' - ' + str(station['vertexB']))
     else:
         print('La edad ingresada no es válida.')
 
@@ -129,14 +134,17 @@ def printOptionEight(routeFromPosition):
     CloserStation1, CloserStation2, PathToFinalStation, Cost = routeFromPosition
 
     print('\nLa estación más cercana al punto inicial ingresado es la: '+ str(CloserStation1['key'])+
-        ', a:  '+ str(CloserStation1['Distance_From_Initial_Point'])+' kilómetros de distancia.')
+        ', a:  '+ str(CloserStation1['value']['Distance_From_Initial_Point'])+' kilómetros de distancia.')
     
     print('\nLa estación más cercana al punto final ingresado es la: '+ str(CloserStation2['key'])+
-        ', a:  '+ str(CloserStation2['Distance_From_Final_Point'])+' kilómetros de distancia.')
+        ', a:  '+ str(CloserStation2['value']['Distance_From_Final_Point'])+' kilómetros de distancia.')
     
-    print('La ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(Cost) +' segundos, el recorrido es: ')
-        while (not stack.isEmpty(pathTo)):
-            station = stack.pop(pathTo)
+    if PathToFinalStation is None:
+        print('No hay ruta válida que conecte a las dos estaciones.')
+    else:
+        print('\nLa ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(Cost) +' segundos, el recorrido es: ')
+        while (not stack.isEmpty(PathToFinalStation)):
+            station = stack.pop(PathToFinalStation)
             print(str(station['vertexA'])+' - ' + str(station['vertexB']))
 
 # ___________________________________________________
@@ -210,11 +218,11 @@ while True:
         print("\nRequerimiento No 6 del Reto 4: ")
 
         print("\nIngrese la Latitud y Longitud de la posición de inicio:")
-        Lat1 = input("Latitud: ")
-        Long1 = input("Longitud: ")
+        Lat1 = float(input("Latitud: "))
+        Long1 = float(input("Longitud: "))
         print("\nIngrese la Latitud y Longitud de la posición final:")
-        Lat2 = input("Latitud: ")
-        Long2 = input("Longitud: ")
+        Lat2 = float(input("Latitud: "))
+        Long2 = float(input("Longitud: "))
         routeFromPosition = controller.getToStationFromCoordinates(cont,Lat1,Long1,Lat2,Long2)
         printOptionEight(routeFromPosition)
 

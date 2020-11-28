@@ -90,8 +90,8 @@ def addTrip(citibike, trip):
     Longitude1 = trip["start station longitude"]
     Latitude1 = trip["start station latitude"]
 
-    Longitude2 = trip["end station longitude"]
-    Latitude2 = trip["end station latitude"]
+    Longitude2 = float(trip["end station longitude"])
+    Latitude2 = float(trip["end station latitude"])
 
     addStation( citibike , origin )
     addStation(citibike,destination)
@@ -127,7 +127,7 @@ def addNumTripsToTotal(citibike,numFileTrips):
     """
     citibike['Num_Of_Total_Trips'] = citibike['Num_Of_Total_Trips'] + numFileTrips
 
-def addEdgeToMap(citibike,station,birth,trip_condition,total_trips):
+def addEdgeToMap(citibike,station,birth,trip_condition,total_trips,Longitude,Latitude):
     """
     RETO 4 | REQ 5
            | REQ 3 
@@ -325,7 +325,7 @@ def routeRecommenderByAge(citibike,age):
     else:
         return None
 
-def getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Long2):
+def getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Lon2):
     """
     RETO4 | REQ 6
     Dada una latitud y longitud inicial,
@@ -347,14 +347,14 @@ def getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Long2):
         station = it.next(iterator)
         sta = m.get(citibike['Edges_Map'],station)
 
-        staLat = sta['value']['Latitude']
-        staLon = sta['value']['Longitude']
+        staLat = float(sta['value']['Latitude'])
+        staLon = float(sta['value']['Longitude'])
 
-        distance_from_initial_point = distance(Lat1,staLat,Lon1,staLon)
-        distance_from_final_point = distance(Lat2,staLat,Lon2,staLat)
+        distance_from_initial_point = distanceFromTo(Lat1,staLat,Lon1,staLon)
+        distance_from_final_point = distanceFromTo(Lat2,staLat,Lon2,staLon)
 
-        sta['value']['Distance_From_Initial_Point'] = distance_from_initial_point
-        sta['value']['Distance_From_Final_Point'] = distance_from_final_point
+        sta['value']['Distance_From_Initial_Point'] = round(distance_from_initial_point,5)
+        sta['value']['Distance_From_Final_Point'] = round(distance_from_final_point,5)
 
         lt.addLast(initialStationSortedByDistance,sta)
         lt.addLast(finalStationSortedByDistance,sta)
@@ -362,9 +362,8 @@ def getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Long2):
     mg.mergesort(initialStationSortedByDistance,closerInitialStation)
     mg.mergesort(finalStationSortedByDistance,closerFinalStation)
 
-    CloserStation1 = lt.firstElement(initialStationSortedByDistance)
-    CloserStation2= lt.firstElement(finalStationSortedByDistance)
-
+    CloserStation1 = lt.lastElement(initialStationSortedByDistance)
+    CloserStation2= lt.lastElement(finalStationSortedByDistance)
 
     paths = djk.Dijkstra(citibike['graph'],CloserStation1['key'])
     pathTo = djk.pathTo(paths,CloserStation2['key'])
@@ -450,10 +449,10 @@ def closerFinalStation(elem1,elem2):
     """
     return int(elem1['value']['Distance_From_Final_Point']) > int(elem2['value']['Distance_From_Final_Point'])
 
-#La función distance fue tomada y adaptada de:
+#La función distanceFromTo fue tomada y adaptada de:
 # https://www.geeksforgeeks.org/program-distance-two-points-earth/
 
-def distance(lat1, lat2, lon1, lon2): 
+def distanceFromTo(lat1, lat2, lon1, lon2): 
       
     # The math module contains a function named 
     # radians which converts from degrees to radians. 
