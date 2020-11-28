@@ -76,12 +76,12 @@ def printOptionThree(clusters):
     else:
         print('Una o ambas estaciones ingresadas no existen.')
 
-def printOptionFour():
-    """
-    RETO4 | REQ2
-    Imprime el requerimiento 2.
-    """
-    print("Se encontraron un total de " + + "rutas posibles.")
+#def printOptionFour():
+#    """
+#    RETO4 | REQ2
+#    Imprime el requerimiento 2.
+#    """
+#    print("Se encontraron un total de " + + "rutas posibles.")
 
 def printOptionFive(critical_stations):
     """
@@ -102,7 +102,6 @@ def printOptionFive(critical_stations):
     for station in least_used:
         print(str(station['key'])+' con: '+ str(station['value']['Total_Trips']) +' viajes en total.')
 
-
 def printOptionSeven(route):
     """
     RETO4 | REQ5
@@ -119,7 +118,6 @@ def printOptionSeven(route):
         if pathTo is None:
             print('No hay ruta válida que conecte a las dos estaciones.')
         else:        
-        
             print('La ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(cost) +' segundos, el recorrido es: ')
             while (not stack.isEmpty(pathTo)):
                 station = stack.pop(pathTo)
@@ -132,11 +130,10 @@ def printOptionEight(routeFromPosition):
     RETO4 | REQ6
     """
     CloserStation1, CloserStation2, PathToFinalStation, Cost = routeFromPosition
-
     print('\nLa estación más cercana al punto inicial ingresado es la: '+ str(CloserStation1['key'])+
         ', a:  '+ str(CloserStation1['value']['Distance_From_Initial_Point'])+' kilómetros de distancia.')
     
-    print('\nLa estación más cercana al punto final ingresado es la: '+ str(CloserStation2['key'])+
+    print('La estación más cercana al punto final ingresado es la: '+ str(CloserStation2['key'])+
         ', a:  '+ str(CloserStation2['value']['Distance_From_Final_Point'])+' kilómetros de distancia.')
     
     if PathToFinalStation is None:
@@ -193,14 +190,14 @@ while True:
         clusters = controller.numConnectedComponents(cont,sta1,sta2)
         printOptionThree(clusters)
 
-    elif int(inputs[0]) == 4:
-        print("\nRequerimiento No 2 del Reto 4: ")
-        sta = input("\nIngrese el ID de la estación de inicio.") 
-        print("Ingrese el total de tiempo disponible: ")
-        t1 = input("Rango inferior: ") 
-        t2 = input("Rango superior: ") 
-        routes = controller.touristroutes(cont,sta,t1,t2)
-        printOptionFour(routes)
+#    elif int(inputs[0]) == 4:
+#        print("\nRequerimiento No 2 del Reto 4: ")
+#        sta = input("\nIngrese el ID de la estación de inicio.") 
+#        print("Ingrese el total de tiempo disponible: ")
+#        t1 = input("Rango inferior: ") 
+#        t2 = input("Rango superior: ") 
+#        routes = controller.touristroutes(cont,sta,t1,t2)
+#        printOptionFour(routes)
 
     elif int(inputs[0]) == 5:
         print("\nRequerimiento No 3 del Reto 4: ")

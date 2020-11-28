@@ -40,7 +40,7 @@ from DISClib.Algorithms.Graphs import dfs
 from DISClib.Algorithms.Sorting import mergesort as mg
 
 from DISClib.Utils import error as error 
-assert config   # nosec
+assert config   
 
 """
 En este archivo definimos los TADs que vamos a usar y las operaciones
@@ -60,7 +60,6 @@ def newAnalyzer():
                     'Num_Of_Total_Trips': None,
                     'Edges_Map': None,
                     }
-
         analyzer['graph'] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
                                               size=1000,
@@ -99,8 +98,6 @@ def addTrip(citibike, trip):
     addEdgeToMap(citibike,origin,birth,'Departure_Ages','Total_Departure_Trips',Longitude1,Latitude1)
     addEdgeToMap(citibike,destination,birth,'Arrival_Ages','Total_Arrival_Trips',Longitude2,Latitude2)
 
-    
-
 def addStation(citibike, station_id):
     """
     Agrega el ID de una estación como vértice del grafo si
@@ -120,7 +117,6 @@ def addConnection(citibike,origin,destination,duration):
     else:
         e.updateAverageWeight(edge,duration)
         
-
 def addNumTripsToTotal(citibike,numFileTrips):
     """
     Calcula el total de viajes en bici realizados.
@@ -368,7 +364,6 @@ def getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Lon2):
 
     return CloserStation1, CloserStation2, pathTo, cost
 
-
 # ==============================
 # Funciones de consulta generales
 # ==============================
@@ -437,7 +432,6 @@ def closerInitialStation(elem1,elem2):
     Función de comparación para el método MergeSort.
     """
     return int(elem1['value']['Distance_From_Initial_Point']) > int(elem2['value']['Distance_From_Initial_Point'])
-
 
 def closerFinalStation(elem1,elem2):
     """
