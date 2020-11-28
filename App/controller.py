@@ -111,16 +111,29 @@ def criticalStations(citibike):
     """
     return model.criticalStations(citibike)
 
-
 def routeRecommenderByAge(citibike,age):
     """
     RETO4 | REQ 5
     Llama a la función en el model que retorna
     la ruta más transitada por las personas en el 
     rango de edad ingresado
-    """
-    
+    """ 
     return model.routeRecommenderByAge(citibike,age)
+
+def getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Lon2):
+    """
+    RETO4 | REQ 6
+    Llama a la función en el model que:
+        Dada una latitud y longitud inicial,
+        se halla la estación de Citibike más cercana.
+
+        Dada una coordenada de destino, se halla
+        la estación de Citibike más cercana.
+
+        Se calcula la ruta de menor tiempo entre estas 
+        dos estaciones.
+    """
+    return model.getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Lon2)
 
 # ___________________________________________________
 #  Funciones para consultas generales

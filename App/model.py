@@ -28,6 +28,7 @@ from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import mapentry as me
+from math import radians, cos, sin, asin, sqrt 
 
 from DISClib.DataStructures import listiterator as it
 from DISClib.DataStructures import edge as e
@@ -38,8 +39,8 @@ from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Algorithms.Graphs import dfs
 from DISClib.Algorithms.Sorting import mergesort as mg
 
-from DISClib.Utils import error as error
-assert config
+from DISClib.Utils import error as error 
+assert config   # nosec
 
 """
 En este archivo definimos los TADs que vamos a usar y las operaciones
@@ -86,11 +87,19 @@ def addTrip(citibike, trip):
     duration = int(trip['tripduration'])
     birth = trip['birth year']
 
-    addStation(citibike,origin)
+    Longitude1 = trip["start station longitude"]
+    Latitude1 = trip["start station latitude"]
+
+    Longitude2 = trip["end station longitude"]
+    Latitude2 = trip["end station latitude"]
+
+    addStation( citibike , origin )
     addStation(citibike,destination)
     addConnection(citibike,origin,destination,duration)
-    addEdgeToMap(citibike,origin,birth,0)
-    addEdgeToMap(citibike,destination,birth,1)
+    addEdgeToMap(citibike,origin,birth,'Departure_Ages','Total_Departure_Trips',Longitude1,Latitude1)
+    addEdgeToMap(citibike,destination,birth,'Arrival_Ages','Total_Arrival_Trips',Longitude2,Latitude2)
+
+    
 
 def addStation(citibike, station_id):
     """
@@ -118,54 +127,54 @@ def addNumTripsToTotal(citibike,numFileTrips):
     """
     citibike['Num_Of_Total_Trips'] = citibike['Num_Of_Total_Trips'] + numFileTrips
 
-def addEdgeToMap(citibike,station,birth,criteria):
+def addEdgeToMap(citibike,station,birth,trip_condition,total_trips):
     """
     RETO 4 | REQ 5
            | REQ 3 
-
-    A cada estación añade el número de personas en un rango 
-    de edad que llegan y salen de la misma.
-
-    Cálcula el total de viajes de sálida y llegada.
+           | REQ 6
+    Crea un entry por cada estación y lo 
+    añade al mapa
     """
     entry = m.get(citibike['Edges_Map'],station) 
     if entry is None:
-        edge_entry = newStationEntry()  
+        edge_entry = newStationEntry(Latitude,Longitude)  
         m.put(citibike['Edges_Map'],station,edge_entry)
     else:
         edge_entry = me.getValue(entry)
 
-    if criteria == 0:
-        trip_condition = 'Departure_Ages'
-        total_trips = 'Total_Departure_Trips'
-    if criteria == 1:
-        trip_condition = 'Arrival_Ages'
-        total_trips = 'Total_Arrival_Trips'
-
     age = 2020 - int(birth)
-    key = ageRange(age)
-    if edge_entry[trip_condition][key] is None:
-        edge_entry[trip_condition][key] = 1
+    AgeRange = ageRange(age)
+
+    if edge_entry[trip_condition][AgeRange] is None:
+        edge_entry[trip_condition][AgeRange] = 1
     else:
-        edge_entry[trip_condition][key] = edge_entry[trip_condition][key] + 1
+        edge_entry[trip_condition][AgeRange] = edge_entry[trip_condition][AgeRange] + 1
 
     edge_entry[total_trips] = edge_entry[total_trips] + 1
     edge_entry['Total_Trips'] = edge_entry['Total_Arrival_Trips'] + edge_entry['Total_Departure_Trips']
 
-def newStationEntry():
+def newStationEntry(Latitude,Longitude):
     """
     Crea un entry en el mapa para una estación.
     Tiene tres llaves:
         Rango de edades de viajes que salen del vértice.
         Rango de edades de viajes que llegan al vértice.
+        Número total de viajes que salen de esta estación.
+        Número total de viajes que llegan a esta estación.
         Número total de viajes.
+        Latitud.
+        Longitud.
     """
-    entry = {'Arrival_Ages':None,'Departure_Ages':None,'Total_Arrival_Trips':0,'Total_Departure_Trips':0, 'Total_Trips': None}
+    entry = {'Arrival_Ages':None,'Departure_Ages':None,
+            'Total_Arrival_Trips':0,'Total_Departure_Trips':0, 
+            'Total_Trips': None, 'Latitude':None, 'Longitude':None}
 
     entry['Arrival_Ages'] = {'Menor de 10': None, '11-20': None, '21-30': None, '31-40': None,
                             '41-50': None, '51-60': None, 'Mayor de 60': None}
     entry['Departure_Ages'] = {'Menor de 10': None, '11-20': None, '21-30': None, '31-40': None,
                             '41-50': None, '51-60': None, 'Mayor de 60': None}
+    entry['Latitude'] = Latitude
+    entry['Longitude'] = Longitude
 
     return entry
 
@@ -200,7 +209,6 @@ def touristroutes(graph,initial_station,time1,time2):
     dado un límite de tiempo y una estación inicial.
     """
     if gr.containsVertex(graph,initial_station):
-        
         sameSCC = m.newMap(numelements=7500,
                         maptype='CHAINING',
                         loadfactor=2,
@@ -219,7 +227,7 @@ def touristroutes(graph,initial_station,time1,time2):
 
             if sc_number == initial_sc_number:
                 m.put(sameCC,station,None)
-    
+
 
 
         search = dfs.DepthFirstSearch()
@@ -230,7 +238,7 @@ def touristroutes(graph,initial_station,time1,time2):
         while it.hasNext(iterator):
             adja = it.next(iterator)
             edge = gr.getEdge(sc,initial_station,adja)
-        
+
 def criticalStations(citibike):
     """
     RETO 4 | REQ 3
@@ -243,17 +251,17 @@ def criticalStations(citibike):
     top_departure = []
     least_used = []
 
-    arrival_lt_sorted = lt.newList(datastructure='ARRAY_LIST',cmpfunction=None)
+    arrival_lt_sorted = lt.newList(datastructure='ARRAY_LIST',cmpfunction=compareValues)
     departure_lt_sorted = lt.newList(datastructure='ARRAY_LIST',cmpfunction=compareValues)
     total_trips_sorted = lt.newList(datastructure='ARRAY_LIST',cmpfunction=compareValues)
 
     stations_keys = m.keySet(citibike['Edges_Map'])
-    
+
     iterator = it.newIterator(stations_keys)
     while it.hasNext(iterator):
         station = it.next(iterator)
         sta = m.get(citibike['Edges_Map'],station)
-            
+
         lt.addLast(arrival_lt_sorted,sta)
         lt.addLast(departure_lt_sorted,sta)
         lt.addLast(total_trips_sorted,sta)
@@ -263,7 +271,7 @@ def criticalStations(citibike):
     mg.mergesort(total_trips_sorted,greaterTotalTrips)
 
     i = 0
-    while i <= 3:
+    while i < 3:
         top_arr = lt.removeFirst(arrival_lt_sorted)    
         top_arrival.append(top_arr)
 
@@ -317,6 +325,52 @@ def routeRecommenderByAge(citibike,age):
     else:
         return None
 
+def getToStationFromCoordinates(citibike,Lat1,Lon1,Lat2,Long2):
+    """
+    RETO4 | REQ 6
+    Dada una latitud y longitud inicial,
+    se halla la estación de Citibike más cercana.
+
+    Dada una coordenada de destino, se halla
+    la estación de Citibike más cercana.
+
+    Se calcula la ruta de menor tiempo entre estas 
+    dos estaciones.
+    """
+
+    stations_keys = m.keySet(citibike['Edges_Map'])
+    initialStationSortedByDistance = lt.newList(datastructure='ARRAY_LIST',cmpfunction=compareValues)
+    finalStationSortedByDistance = lt.newList(datastructure='ARRAY_LIST',cmpfunction=compareValues)
+
+    iterator = it.newIterator(stations_keys)
+    while it.hasNext(iterator):
+        station = it.next(iterator)
+        sta = m.get(citibike['Edges_Map'],station)
+
+        staLat = sta['value']['Latitude']
+        staLon = sta['value']['Longitude']
+
+        distance_from_initial_point = distance(Lat1,staLat,Lon1,staLon)
+        distance_from_final_point = distance(Lat2,staLat,Lon2,staLat)
+
+        sta['value']['Distance_From_Initial_Point'] = distance_from_initial_point
+        sta['value']['Distance_From_Final_Point'] = distance_from_final_point
+
+        lt.addLast(initialStationSortedByDistance,sta)
+        lt.addLast(finalStationSortedByDistance,sta)
+
+    mg.mergesort(initialStationSortedByDistance,closerInitialStation)
+    mg.mergesort(finalStationSortedByDistance,closerFinalStation)
+
+    CloserStation1 = lt.firstElement(initialStationSortedByDistance)
+    CloserStation2= lt.firstElement(finalStationSortedByDistance)
+
+
+    paths = djk.Dijkstra(citibike['graph'],CloserStation1['key'])
+    pathTo = djk.pathTo(paths,CloserStation2['key'])
+    cost = djk.distTo(paths,CloserStation2['key'])
+
+    return CloserStation1, CloserStation2, pathTo, cost
 
 
 # ==============================
@@ -362,18 +416,63 @@ def ageRange(age):
 
 def greaterValueArrival(elem1,elem2):
     """
+    RETO4 | REQ3
+    Función de comparación para el método MergeSort.
     """
     return int(elem1['value']['Total_Arrival_Trips']) > int(elem2['value']['Total_Arrival_Trips'])
 
 def greaterValueDeparture(elem1,elem2):
     """
+    RETO4 | REQ3
+    Función de comparación para el método MergeSort.
     """
     return int(elem1['value']['Total_Departure_Trips']) > int(elem2['value']['Total_Departure_Trips'])
 
 def greaterTotalTrips(elem1,elem2):
     """
+    RETO4 | REQ3
+    Función de comparación para el método MergeSort.
     """
     return int(elem1['value']['Total_Trips']) > int(elem2['value']['Total_Trips'])
+
+def closerInitialStation(elem1,elem2):
+    """
+    RETO4 | REQ 6
+    Función de comparación para el método MergeSort.
+    """
+    return int(elem1['value']['Distance_From_Initial_Point']) > int(elem2['value']['Distance_From_Initial_Point'])
+
+
+def closerFinalStation(elem1,elem2):
+    """
+    RETO4 | REQ 6
+    Función de comparación para el método MergeSort.
+    """
+    return int(elem1['value']['Distance_From_Final_Point']) > int(elem2['value']['Distance_From_Final_Point'])
+
+#La función distance fue tomada y adaptada de:
+# https://www.geeksforgeeks.org/program-distance-two-points-earth/
+
+def distance(lat1, lat2, lon1, lon2): 
+      
+    # The math module contains a function named 
+    # radians which converts from degrees to radians. 
+    lon1 = radians(lon1) 
+    lon2 = radians(lon2) 
+    lat1 = radians(lat1) 
+    lat2 = radians(lat2) 
+
+    # Haversine formula  
+    dlon = lon2 - lon1  
+    dlat = lat2 - lat1 
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2 
+    c = 2 * asin(sqrt(a))  
+     
+    # Radius of earth in kilometers. Use 3956 for miles 
+    r = 6371
+       
+    # calculate the result 
+    return(c * r) 
 # ==============================
 # Funciones de Comparacion
 # ==============================

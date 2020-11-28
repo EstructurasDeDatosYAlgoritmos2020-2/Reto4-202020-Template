@@ -30,7 +30,7 @@ import config
 from App import controller
 from DISClib.ADT import stack
 import timeit
-assert config
+assert config   # nosec
 
 """
 La vista se encarga de la interacción con el usuario.
@@ -58,7 +58,7 @@ def printOptionTwo(cont):
     print('\nEstaciones (vértices) cargadas: ' + str(controller.numStations(cont)))
     print('Conexiones (arcos) entre estaciones cargadas: ' + str(controller.numConnections(cont)))
     print('Viajes en bici cargados: ' + str(cont['Num_Of_Total_Trips']))
-    
+
     print('\nEl limite de recursion actual: ' + str(sys.getrecursionlimit()))
     sys.setrecursionlimit(recursionLimit)
     print('El limite de recursion se ajusta a: ' + str(recursionLimit))
@@ -122,10 +122,23 @@ def printOptionSeven(route):
     else:
         print('La edad ingresada no es válida.')
 
-def printOptionEight():
+def printOptionEight(routeFromPosition):
     """
     RETO4 | REQ6
     """
+    CloserStation1, CloserStation2, PathToFinalStation, Cost = routeFromPosition
+
+    print('\nLa estación más cercana al punto inicial ingresado es la: '+ str(CloserStation1['key'])+
+        ', a:  '+ str(CloserStation1['Distance_From_Initial_Point'])+' kilómetros de distancia.')
+    
+    print('\nLa estación más cercana al punto final ingresado es la: '+ str(CloserStation2['key'])+
+        ', a:  '+ str(CloserStation2['Distance_From_Final_Point'])+' kilómetros de distancia.')
+    
+    print('La ruta más corta entre estas dos estaciones, tiene un costo de: '+ str(Cost) +' segundos, el recorrido es: ')
+        while (not stack.isEmpty(pathTo)):
+            station = stack.pop(pathTo)
+            print(str(station['vertexA'])+' - ' + str(station['vertexB']))
+
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
@@ -153,7 +166,7 @@ Menu principal
 """
 while True:
     printMenu()
-    inputs = input('Seleccione una opción para continuar\n>')
+    inputs = input('Seleccione una opción para continuar\n>')   # nosec
 
     if int(inputs[0]) == 1:
         print("\nInicializando....")
@@ -167,17 +180,17 @@ while True:
        
     elif int(inputs[0]) == 3:
         print("\nRequerimiento No 1 del Reto 4: ")
-        sta1 = input("\nIngrese el ID de la estación 1: ") # nosec
-        sta2 = input("Ingrese el ID de la estación 2: ") # nosec
+        sta1 = input("\nIngrese el ID de la estación 1: ") 
+        sta2 = input("Ingrese el ID de la estación 2: ")    
         clusters = controller.numConnectedComponents(cont,sta1,sta2)
         printOptionThree(clusters)
 
     elif int(inputs[0]) == 4:
         print("\nRequerimiento No 2 del Reto 4: ")
-        sta = input("\nIngres el ID de la estación de inicio.")
+        sta = input("\nIngrese el ID de la estación de inicio.") 
         print("Ingrese el total de tiempo disponible: ")
-        t1 = input("Rango inferior: ")
-        t2 = input("Rango superior: ")
+        t1 = input("Rango inferior: ") 
+        t2 = input("Rango superior: ") 
         routes = controller.touristroutes(cont,sta,t1,t2)
         printOptionFour(routes)
 
@@ -190,16 +203,22 @@ while True:
 
     elif int(inputs[0]) == 7:
         print("\nRequerimiento No 5 del Reto 4: ")
-        age = input("Ingrese su edad: ")
+        age = input("Ingrese su edad: ") 
         route = controller.routeRecommenderByAge(cont,age)
         printOptionSeven(route)
     elif int(inputs[0]) == 8:
         print("\nRequerimiento No 6 del Reto 4: ")
-        printOptionEight()
+
+        print("\nIngrese la Latitud y Longitud de la posición de inicio:")
+        Lat1 = input("Latitud: ")
+        Long1 = input("Longitud: ")
+        print("\nIngrese la Latitud y Longitud de la posición final:")
+        Lat2 = input("Latitud: ")
+        Long2 = input("Longitud: ")
+        routeFromPosition = controller.getToStationFromCoordinates(cont,Lat1,Long1,Lat2,Long2)
+        printOptionEight(routeFromPosition)
 
     else:
         sys.exit(0)
 sys.exit(0)
 
-[bandit]
-skips: B322
