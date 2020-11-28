@@ -202,42 +202,39 @@ def sameCC(graph,station1, station2):
     else:
         return None
 
-def touristroutes(graph,initial_station,time1,time2):
-    """
-    RETO4 | REQ2
-    Retorna las rutas turísticas posibles
-    dado un límite de tiempo y una estación inicial.
-    """
-    if gr.containsVertex(graph,initial_station):
-        sameSCC = m.newMap(numelements=7500,
-                        maptype='CHAINING',
-                        loadfactor=2,
-                        comparefunction=compareStations)
-
-        sc = scc.KosarajuSCC(graph)  
-        initial_sc_number = m.get(sc['idscc'],initial_station)
-        all_stations = m.keySet(sc['idscc'])
-
-        accum_time = 0
-
-        iterator = it.newIterator(all_stations)
-        while it.hasNext(iterator):
-            station = it.next(iterator)
-            sc_number = m.get(sc['idscc'],station)
-
-            if sc_number == initial_sc_number:
-                m.put(sameCC,station,None)
-
-
-
-        search = dfs.DepthFirstSearch()
-
-        adjacents = gr.adjacents(sc,initial_station)
-
-        iterator = it.newIterator(adjacents)
-        while it.hasNext(iterator):
-            adja = it.next(iterator)
-            edge = gr.getEdge(sc,initial_station,adja)
+#def touristroutes(graph,initial_station,time1,time2):
+#    """
+#    RETO4 | REQ2
+#    Retorna las rutas turísticas posibles
+#    dado un límite de tiempo y una estación inicial.
+#    """
+#    if gr.containsVertex(graph,initial_station):
+#        sameSCC = m.newMap(numelements=7500,
+#                        maptype='CHAINING',
+#                        loadfactor=2,
+#                        comparefunction=compareStations)
+#
+#        sc = scc.KosarajuSCC(graph)  
+#        initial_sc_number = m.get(sc['idscc'],initial_station)
+#        all_stations = m.keySet(sc['idscc'])
+#
+#        accum_time = 0
+#
+#        iterator = it.newIterator(all_stations)
+#        while it.hasNext(iterator):
+#            station = it.next(iterator)
+#            sc_number = m.get(sc['idscc'],station)
+#
+#            if sc_number == initial_sc_number:
+#                m.put(sameCC,station,None)
+#        search = dfs.DepthFirstSearch()
+#
+#        adjacents = gr.adjacents(sc,initial_station)
+#
+#        iterator = it.newIterator(adjacents)
+#        while it.hasNext(iterator):
+#            adja = it.next(iterator)
+#            edge = gr.getEdge(sc,initial_station,adja)
 
 def criticalStations(citibike):
     """
